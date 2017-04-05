@@ -1,5 +1,5 @@
-# compiled code
-lib
+# pre-compiled code
+src
 
 # Logs
 logs
@@ -21,6 +21,8 @@ jspm_packages
 
 # npm stuff
 .npm
+.npmignore
+.npmrc
 
 # editors
 .idea
