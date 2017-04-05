@@ -30,6 +30,7 @@ export default class StorageRedis extends StorageBase
 
     client.getBuffer(key, (err, result) => {
       if (err) return void cb(err);
+      if (!result) return void cb(new Error('File ' + key + ' not found'));
       try {
         const file = File.fromBuffer(result);
 
