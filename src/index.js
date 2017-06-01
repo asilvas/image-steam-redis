@@ -17,13 +17,20 @@ export default class StorageRedis extends StorageBase
     if (!this.options.servers || !Array.isArray(this.options.servers) || this.options.servers.length === 0) {
       throw new Error('StorageRedis.servers must be a valid array of objects [{host, port}]');
     }
+    const clusterOpts = this.options.options;
+    if (clusterOpts && clusterOpts.redisOptions && clusterOpts.redisOptions.keyPrefix) {
+      this.keyPrefix = clusterOpts.redisOptions.keyPrefix;
+      delete clusterOpts.redisOptions.keyPrefix; // remove from redisOptions to avoid double prefix if ioredis ever fixes cluster bug
+    } else {
+      this.keyPrefix = 'isteam::';
+    }
   }
 
   fetch(opts, originalPath, stepsHash, cb) {
     const options = this.getOptions(opts);
     const client = this.getClient(options);
 
-    let key = originalPath;
+    let key = `${this.keyPrefix}${originalPath}`;
     if (stepsHash) {
       key += '/' + stepsHash;
     }
@@ -48,7 +55,7 @@ export default class StorageRedis extends StorageBase
     if (!stepsHash) {
       return void cb(new Error('StorageRedis::Cannot store an image over the original'));
     }
-    const key = `${originalPath}/${stepsHash}`;
+    const key = `${this.keyPrefix}${originalPath}/${stepsHash}`;
 
     image.info.stepsHash = stepsHash;
 

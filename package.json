@@ -1,11 +1,12 @@
 {
   "name": "image-steam-redis",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Redis client for Image Steam: https://github.com/asilvas/node-image-steam",
   "main": "index.js",
   "scripts": {
     "build": "babel ./src --out-dir ./lib",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "watch": "babel --watch ./src --out-dir ./lib"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,7 @@
   "homepage": "https://github.com/asilvas/image-steam-redis#readme",
   "dependencies": {
     "extend": "^3.0.0",
-    "ioredis": "^2.5.0"
+    "ioredis": "^3.1.1"
   },
   "peerDependencies": {
     "image-steam": ">=0.10.0"
