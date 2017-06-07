@@ -65,6 +65,35 @@ export default class StorageRedis extends StorageBase
     client.set(key, fileBuffer, cb);
   }
 
+  deleteCache(opts, originalPath, cb) {
+    // intended to be used with cache objects only
+    const options = this.getOptions(opts);
+    const client = this.getClient(options);
+    const nodes = client.nodes('master');
+
+    const match = `${this.keyPrefix}${originalPath}/*`;
+    const scanKeys = (node) => {
+      return new Promise((reject, resolve) => {
+        const stream = node.scanStream({
+          match,
+          count: 500 // ~2.5ms
+        });
+        stream.on('data', keys => {
+          if (keys && keys.length > 0) {
+            // fire and forget: don't block on key deletion
+            keys.forEach(key => client.del(key));
+            // note: cannot use `client.del(keys)` as the keys can span many nodes
+          }
+        });
+        stream.on('end', resolve);
+        stream.on('error', reject);
+      });
+    };
+
+    // run SCAN on all nodes for the child assets
+    Promise.all(nodes.map(scanKeys)).then(() => cb()).catch(cb);
+  }
+
   getOptions(opts) {
     return extend(true, {
       options: defaultOptions
