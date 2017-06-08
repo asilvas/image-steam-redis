@@ -71,7 +71,7 @@ export default class StorageRedis extends StorageBase
     const client = this.getClient(options);
     const nodes = client.nodes('master');
 
-    const match = `${this.keyPrefix}${originalPath}/*`;
+    const match = `${this.keyPrefix}${originalPath + (originalPath[originalPath.length - 1] === '/' ? '' : '/')}*`;
     const scanKeys = (node) => {
       return new Promise((reject, resolve) => {
         const stream = node.scanStream({
